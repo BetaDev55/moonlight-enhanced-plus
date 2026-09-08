@@ -6,23 +6,29 @@
 
 ## 🌟 Features & Changes from Upstream
 
-This fork focuses on enhancing the mobile and tablet streaming experience by replacing static on-screen buttons with a highly customizable floating UI.
+This fork introduces completely new ways to interact with your streaming session, focusing on touchscreen accessibility and customization.
 
-### 1. Draggable Floating Bubbles (UI Enhancement)
-- Replaced the static keyboard and menu overlay buttons with modern, floating circular "bubbles".
-- **Free Dragging:** The bubbles can be dragged anywhere on the screen during your gaming session.
-- **Persistent State:** Bubble positions are saved using normalized coordinates, meaning they will stay exactly where you left them across sessions, reboots, and screen rotations.
-- **Render-Safe Architecture:** Custom drawable selectors were designed specifically to avoid `SurfaceFlinger` hardware composition crashes when rendering ripple projection masks over video surfaces on 60fps (especially important for environments like Waydroid).
+### 1. Core New Features
+- **On-Screen Keyboard Button:** Added a dedicated on-screen button to instantly summon the software keyboard during a game. In original Moonlight, invoking the keyboard relies on complex gestures (like a three-finger tap) that often fail or conflict with game inputs.
+- **On-Screen Session Menu Button:** Added a dedicated button to easily open the Moonlight session settings (to switch monitors, send Ctrl+Alt+Del, or disconnect) without relying on the Android "Back" gesture.
+- **Direct Mouse by Default:** Changed the default touch behavior from relative trackpad mode to "Absolute Touch" (direct click), making touch-based navigation in desktop environments much more intuitive right out of the box.
 
-### 2. Live Overlay Customization Panel
-When you tap the Menu bubble, a new set of controls allows you to customize the bubbles in real-time without leaving your stream:
-- **Opacity Slider:** Adjust the translucency of the bubbles so they don't obscure your gameplay (from 20% to 100%).
-- **Size Slider:** Scale the bubbles from a tiny 30dp footprint up to a massive 82dp footprint.
-- **Color Picker:** Instantly theme the bubble backgrounds with White, Red, Green, or Blue presets.
-- **Reset Layout:** A quick "Reset Controls Layout" button to restore default positions, sizes, and colors.
-- **Toggle Visibility:** Quickly hide the Keyboard bubble if you're using a physical controller.
+### 2. Quality of Life (QOL) & Customization
+Instead of making these new buttons static, we implemented them as highly advanced **Floating Bubbles**:
+- **Free Drag-and-Drop:** The Keyboard and Menu bubbles can be dragged anywhere on the screen so they never block crucial game UI.
+- **Persistent Memory:** Bubble positions are automatically saved. They will stay exactly where you left them across sessions, reboots, and screen rotations.
+- **Live Customization Panel:** Tapping the Menu bubble opens a new interface that lets you customize the bubbles in real-time:
+  - **Opacity Slider:** Adjust the translucency (20% to 100%) so they blend seamlessly into your game.
+  - **Size Slider:** Scale the bubbles from 30dp up to 82dp.
+  - **Color Picker:** Theme the bubbles with White, Red, Green, or Blue presets.
+  - **Visibility Toggle:** Easily hide the Keyboard bubble if you're using a physical controller.
+  - **Reset Layout:** Instantly restore default positions, sizes, and colors.
+- **Menu Reordering:** Reordered the session menu so that the most frequently used options (Switch Monitor and Actions) are prioritized at the top.
 
-### 3. Legal & Branding Updates
+### 3. Stability & Architecture Fixes
+- **Render-Safe UI:** Designed custom drawable selectors specifically to avoid Android `SurfaceFlinger` hardware composition crashes. This guarantees 60fps stability without visual artifacts or "clipping" bugs when rendering the floating UI over the video decoder surface (especially critical for environments like Waydroid).
+
+### 4. Legal & Branding Updates
 - App renamed internally and externally to **Moonlight Enhanced Plus**.
 - Included a mandatory First-Run Disclaimer Dialog ensuring users understand this is an AI-assisted community fork.
 - Added a permanent "About" section in the Android preferences panel.
