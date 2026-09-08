@@ -17,6 +17,151 @@
         android:paddingBottom="8dp">
 
         <!-- CONTROLS SECTION -->
+<!-- DISPLAY SECTION -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Display"
+            android:textColor="#AAAAAA"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:paddingBottom="8dp"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingBottom="8dp">
+                
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_monitor_native" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Switch Monitor"
+                    android:textColor="#FFFFFF"
+                    android:textSize="16sp"
+                    android:layout_marginStart="16dp"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginStart="40dp"
+                android:paddingBottom="8dp">
+                
+                <Button
+                    android:id="@+id/btn_menu_display_1"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="48dp"
+                    android:text="1"
+                    android:background="@drawable/bg_small_btn"
+                    android:textColor="#FFFFFF"
+                    android:layout_marginEnd="4dp"/>
+                <Button
+                    android:id="@+id/btn_menu_display_2"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="48dp"
+                    android:text="2"
+                    android:background="@drawable/bg_small_btn"
+                    android:textColor="#FFFFFF"
+                    android:layout_marginEnd="4dp"/>
+                <Button
+                    android:id="@+id/btn_menu_display_3"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="48dp"
+                    android:text="3"
+                    android:background="@drawable/bg_small_btn"
+                    android:textColor="#FFFFFF"/>
+            </LinearLayout>
+        </LinearLayout>
+
+        <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#22FFFFFF" android:layout_marginTop="8dp" android:layout_marginBottom="8dp"/>
+
+        <!-- ACTIONS SECTION -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Actions"
+            android:textColor="#AAAAAA"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:paddingBottom="8dp"/>
+
+        <LinearLayout
+            android:id="@+id/btn_menu_cad"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="52dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:background="@drawable/bg_menu_item_ripple"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:clickable="true"
+            android:focusable="true">
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_keyboard" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Send Ctrl+Alt+Del"
+                android:textColor="#FFFFFF"
+                android:textSize="16sp"
+                android:layout_marginStart="16dp"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/btn_menu_disconnect"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="52dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:background="@drawable/bg_menu_item_ripple"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:clickable="true"
+            android:focusable="true">
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_disconnect_native" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Disconnect"
+                android:textColor="#FF5252"
+                android:textSize="16sp"
+                android:layout_marginStart="16dp"/>
+        </LinearLayout>
+
+
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -230,149 +375,8 @@
 
         <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#22FFFFFF" android:layout_marginTop="8dp" android:layout_marginBottom="8dp"/>
 
-        <!-- DISPLAY SECTION -->
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Display"
-            android:textColor="#AAAAAA"
-            android:textSize="12sp"
-            android:textStyle="bold"
-            android:paddingStart="16dp"
-            android:paddingEnd="16dp"
-            android:paddingBottom="8dp"/>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:paddingStart="16dp"
-            android:paddingEnd="16dp">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:paddingBottom="8dp">
-                
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/ic_monitor_native" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Switch Monitor"
-                    android:textColor="#FFFFFF"
-                    android:textSize="16sp"
-                    android:layout_marginStart="16dp"/>
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginStart="40dp"
-                android:paddingBottom="8dp">
-                
-                <Button
-                    android:id="@+id/btn_menu_display_1"
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
-                    android:layout_height="48dp"
-                    android:text="1"
-                    android:background="@drawable/bg_small_btn"
-                    android:textColor="#FFFFFF"
-                    android:layout_marginEnd="4dp"/>
-                <Button
-                    android:id="@+id/btn_menu_display_2"
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
-                    android:layout_height="48dp"
-                    android:text="2"
-                    android:background="@drawable/bg_small_btn"
-                    android:textColor="#FFFFFF"
-                    android:layout_marginEnd="4dp"/>
-                <Button
-                    android:id="@+id/btn_menu_display_3"
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
-                    android:layout_height="48dp"
-                    android:text="3"
-                    android:background="@drawable/bg_small_btn"
-                    android:textColor="#FFFFFF"/>
-            </LinearLayout>
-        </LinearLayout>
-
-        <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#22FFFFFF" android:layout_marginTop="8dp" android:layout_marginBottom="8dp"/>
-
-        <!-- ACTIONS SECTION -->
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Actions"
-            android:textColor="#AAAAAA"
-            android:textSize="12sp"
-            android:textStyle="bold"
-            android:paddingStart="16dp"
-            android:paddingEnd="16dp"
-            android:paddingBottom="8dp"/>
-
-        <LinearLayout
-            android:id="@+id/btn_menu_cad"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:minHeight="52dp"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:background="@drawable/bg_menu_item_ripple"
-            android:paddingStart="16dp"
-            android:paddingEnd="16dp"
-            android:clickable="true"
-            android:focusable="true">
-
-            <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@drawable/ic_keyboard" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Send Ctrl+Alt+Del"
-                android:textColor="#FFFFFF"
-                android:textSize="16sp"
-                android:layout_marginStart="16dp"/>
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/btn_menu_disconnect"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:minHeight="52dp"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:background="@drawable/bg_menu_item_ripple"
-            android:paddingStart="16dp"
-            android:paddingEnd="16dp"
-            android:clickable="true"
-            android:focusable="true">
-
-            <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@drawable/ic_disconnect_native" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Disconnect"
-                android:textColor="#FF5252"
-                android:textSize="16sp"
-                android:layout_marginStart="16dp"/>
-        </LinearLayout>
+        
+        
 
     </LinearLayout>
 </ScrollView>
