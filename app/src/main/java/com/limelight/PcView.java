@@ -250,15 +250,9 @@ public class PcView extends Activity implements AdapterFragmentCallbacks {
     private void checkFirstRunDisclaimer() {
         final android.content.SharedPreferences prefs = getSharedPreferences("moonlight_plus_prefs", MODE_PRIVATE);
         if (!prefs.getBoolean("disclaimer_accepted", false)) {
-            new androidx.appcompat.app.AlertDialog.Builder(this)
+            new android.app.AlertDialog.Builder(this)
                 .setTitle("Moonlight Enhanced Plus")
-                .setMessage("Welcome to Moonlight Enhanced Plus!
-
-This is an UNOFFICIAL, community-maintained fork of Moonlight Game Streaming.
-
-This project was developed with the assistance of Artificial Intelligence (AI) and is NOT affiliated with, endorsed by, or supported by NVIDIA Corporation, the official Moonlight project, or its developers.
-
-Please do not report bugs regarding this fork to the official Moonlight developers.")
+                .setMessage("Welcome to Moonlight Enhanced Plus!\n\nThis is an UNOFFICIAL, community-maintained fork of Moonlight Game Streaming.\n\nThis project was developed with the assistance of Artificial Intelligence (AI) and is NOT affiliated with, endorsed by, or supported by NVIDIA Corporation, the official Moonlight project, or its developers.\n\nPlease do not report bugs regarding this fork to the official Moonlight developers.")
                 .setPositiveButton("I Understand", new android.content.DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(android.content.DialogInterface dialog, int which) {
