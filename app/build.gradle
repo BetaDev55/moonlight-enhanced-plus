@@ -84,8 +84,8 @@ android {
     buildTypes {
         debug {
             applicationIdSuffix ".debug"
-            resValue "string", "app_label", "Moonlight (Debug)"
-            resValue "string", "app_label_root", "Moonlight (Root Debug)"
+            resValue "string", "app_label", "Moonlight Enhanced Plus (Debug)"
+            resValue "string", "app_label_root", "Moonlight Enhanced Plus (Root Debug)"
         }
         release {
             // To whomever is releasing/using an APK in release mode with
@@ -119,8 +119,8 @@ android {
             //
             // TL;DR: Leave the following line alone!
             applicationIdSuffix ".unofficial"
-            resValue "string", "app_label", "Moonlight"
-            resValue "string", "app_label_root", "Moonlight (Root)"
+            resValue "string", "app_label", "Moonlight Enhanced Plus"
+            resValue "string", "app_label_root", "Moonlight Enhanced Plus (Root)"
 
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'

@@ -284,4 +284,12 @@
             android:summary="@string/summary_privacy_policy"
             url="https://moonlight-stream.org/privacy.html"/>
     </PreferenceCategory-->
+    <PreferenceCategory android:title="About Moonlight Enhanced Plus">
+        <Preference
+            android:title="Unofficial Fork"
+            android:summary="This is an unofficial community-maintained fork of Moonlight Game Streaming. It is NOT affiliated with NVIDIA or the official Moonlight project." />
+        <Preference
+            android:title="AI Assisted Development"
+            android:summary="This project was developed with the assistance of Artificial Intelligence (Google Deepmind Antigravity). Please do not report bugs to the official Moonlight developers." />
+    </PreferenceCategory>
 </PreferenceScreen>
