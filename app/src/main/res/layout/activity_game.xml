@@ -32,7 +32,7 @@
         android:layout_gravity="left"
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:gravity="left"
-        android:background="#80000000"
+        android:background="@drawable/bg_floating_bubble"
         android:preferKeepClear="true"
         android:visibility="gone" />
 
@@ -46,8 +46,46 @@
         android:layout_gravity="right"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:gravity="right"
-        android:background="#80000000"
+        android:background="@drawable/bg_floating_bubble"
         android:preferKeepClear="true"
         android:visibility="gone" />
+
+    <FrameLayout
+        android:id="@+id/floating_overlay_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@android:color/transparent"
+        android:clipChildren="false"
+        android:clipToPadding="false">
+        
+        <ImageButton
+            android:id="@+id/btn_keyboard"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:src="@drawable/ic_keyboard"
+            android:background="@drawable/bg_floating_bubble"
+            android:focusable="true"
+            android:clickable="true"
+            android:scaleType="fitCenter"
+            android:padding="10dp"
+            android:contentDescription="Toggle Keyboard"
+            android:layout_gravity="top|start"
+            android:visibility="gone" />
+
+        <ImageButton
+            android:id="@+id/btn_menu"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:src="@drawable/ic_menu_overlay"
+            android:background="@drawable/bg_floating_bubble"
+            android:focusable="true"
+            android:clickable="true"
+            android:scaleType="fitCenter"
+            android:padding="10dp"
+            android:contentDescription="Open Menu"
+            android:layout_gravity="top|start"
+            android:visibility="gone" />
+            
+    </FrameLayout>
 
 </merge>

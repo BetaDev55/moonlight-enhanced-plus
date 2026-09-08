@@ -26,12 +26,12 @@ public class AbsoluteTouchContext implements TouchContext {
             // This timer should have already expired, but cancel it just in case
             cancelTapDownTimer();
 
-            // Switch from a left click to a right click after a long press
+            // Switch to a left click down for dragging after a long press
             confirmedLongPress = true;
-            if (confirmedTap) {
-                conn.sendMouseButtonUp(MouseButtonPacket.BUTTON_LEFT);
+            if (!confirmedTap) {
+                updatePosition(lastTouchDownX, lastTouchDownY);
+                conn.sendMouseButtonDown(MouseButtonPacket.BUTTON_LEFT);
             }
-            conn.sendMouseButtonDown(MouseButtonPacket.BUTTON_RIGHT);
         }
     };
 
@@ -130,10 +130,7 @@ public class AbsoluteTouchContext implements TouchContext {
             cancelTapDownTimer();
 
             // Raise the mouse buttons that we currently have down
-            if (confirmedLongPress) {
-                conn.sendMouseButtonUp(MouseButtonPacket.BUTTON_RIGHT);
-            }
-            else if (confirmedTap) {
+            if (confirmedLongPress || confirmedTap) {
                 conn.sendMouseButtonUp(MouseButtonPacket.BUTTON_LEFT);
             }
             else {
@@ -227,10 +224,7 @@ public class AbsoluteTouchContext implements TouchContext {
         cancelTapDownTimer();
 
         // Raise the mouse buttons
-        if (confirmedLongPress) {
-            conn.sendMouseButtonUp(MouseButtonPacket.BUTTON_RIGHT);
-        }
-        else if (confirmedTap) {
+        if (confirmedLongPress || confirmedTap) {
             conn.sendMouseButtonUp(MouseButtonPacket.BUTTON_LEFT);
         }
     }

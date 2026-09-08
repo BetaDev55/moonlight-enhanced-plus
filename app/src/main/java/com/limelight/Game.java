@@ -181,6 +181,221 @@ public class Game extends Activity implements SurfaceHolder.Callback,
     public static final String EXTRA_APP_HDR = "HDR";
     public static final String EXTRA_SERVER_CERT = "ServerCert";
 
+
+    private android.content.SharedPreferences prefs;
+    private android.view.View btnKeyboard;
+    private android.view.View btnMenu;
+        
+    private void setupDraggableBubble(final android.view.View v, final String idPrefix) {
+        v.setOnTouchListener(new android.view.View.OnTouchListener() {
+            private float startX, startY;
+            private float initialX, initialY;
+            private boolean isDragging;
+            private int touchSlop = android.view.ViewConfiguration.get(Game.this).getScaledTouchSlop();
+
+            @Override
+            public boolean onTouch(android.view.View view, android.view.MotionEvent event) {
+                switch (event.getAction()) {
+                    case android.view.MotionEvent.ACTION_DOWN:
+                        v.setElevation(0f);
+                        v.setTranslationZ(0f);
+                        startX = event.getRawX();
+                        startY = event.getRawY();
+                        initialX = v.getX();
+                        initialY = v.getY();
+                        isDragging = false;
+                        return true;
+
+                    case android.view.MotionEvent.ACTION_MOVE:
+                        float dx = event.getRawX() - startX;
+                        float dy = event.getRawY() - startY;
+
+                        if (!isDragging && (dx * dx + dy * dy > touchSlop * touchSlop)) {
+                            isDragging = true;
+                        }
+
+                        if (isDragging) {
+                            android.view.View parent = (android.view.View) v.getParent();
+                            if (parent != null) {
+                                float newX = initialX + dx;
+                                float newY = initialY + dy;
+
+                                float minX = 0;
+                                float maxX = parent.getWidth() - v.getWidth();
+                                float minY = 0;
+                                float maxY = parent.getHeight() - v.getHeight();
+
+                                newX = Math.max(minX, Math.min(newX, maxX));
+                                newY = Math.max(minY, Math.min(newY, maxY));
+
+                                v.setX(newX);
+                                v.setY(newY);
+                            }
+                            return true;
+                        }
+                        break;
+
+                    case android.view.MotionEvent.ACTION_UP:
+                        if (isDragging) {
+                            android.view.View parent = (android.view.View) v.getParent();
+                            if (parent != null) {
+                                float minX = 0;
+                                float maxX = parent.getWidth() - v.getWidth();
+                                float minY = 0;
+                                float maxY = parent.getHeight() - v.getHeight();
+
+                                float normalizedX = 0f;
+                                if (maxX > minX) normalizedX = (v.getX() - minX) / (maxX - minX);
+                                
+                                float normalizedY = 0f;
+                                if (maxY > minY) normalizedY = (v.getY() - minY) / (maxY - minY);
+                                
+                                prefs.edit()
+                                    .putFloat(idPrefix + "_nx", normalizedX)
+                                    .putFloat(idPrefix + "_ny", normalizedY)
+                                    .apply();
+                            }
+                        } else {
+                            v.performClick();
+                        }
+                        return true;
+                }
+                return false;
+            }
+        });
+    }
+
+    private void restoreBubblePosition(final android.view.View v, final String idPrefix, final float defaultNx, final float defaultNy) {
+        if (v == null) return;
+        final android.view.View parent = (android.view.View) v.getParent();
+        if (parent == null) {
+            v.post(new Runnable() {
+                @Override
+                public void run() {
+                    restoreBubblePosition(v, idPrefix, defaultNx, defaultNy);
+                }
+            });
+            return;
+        }
+
+        parent.post(new Runnable() {
+            @Override
+            public void run() {
+                float nx = prefs.getFloat(idPrefix + "_nx", defaultNx);
+                float ny = prefs.getFloat(idPrefix + "_ny", defaultNy);
+
+                float minX = 0;
+                float maxX = parent.getWidth() - v.getWidth();
+                float minY = 0;
+                float maxY = parent.getHeight() - v.getHeight();
+
+                float newX = minX + nx * (maxX - minX);
+                float newY = minY + ny * (maxY - minY);
+
+                newX = Math.max(minX, Math.min(newX, maxX));
+                newY = Math.max(minY, Math.min(newY, maxY));
+
+                v.setX(newX);
+                v.setY(newY);
+            }
+        });
+    }
+
+    private void applyBubbleVisibility() {
+        android.view.View overlayContainer = findViewById(R.id.floating_overlay_container);
+        if (overlayContainer != null) {
+            overlayContainer.bringToFront();
+        }
+
+        if (btnKeyboard != null) {
+            boolean showKb = prefs.getBoolean("show_keyboard_btn", true);
+            if (!showKb) {
+                btnKeyboard.setVisibility(android.view.View.GONE);
+            } else {
+                btnKeyboard.setVisibility(android.view.View.VISIBLE);
+                restoreBubblePosition(btnKeyboard, "bubble_kb", 0.05f, 0.2f);
+                btnKeyboard.setElevation(0f);
+                btnKeyboard.setTranslationZ(0f);
+            }
+        }
+        if (btnMenu != null) {
+            btnMenu.setVisibility(android.view.View.VISIBLE);
+            restoreBubblePosition(btnMenu, "bubble_menu", 0.05f, 0.35f);
+            btnMenu.setElevation(0f);
+            btnMenu.setTranslationZ(0f);
+        }
+        
+
+    }
+
+    private void updateBubbleSize() {
+        int progress = prefs.getInt("bubble_size", 50);
+        float density = getResources().getDisplayMetrics().density;
+        int sizePx = (int) ((30 + progress * 0.52f) * density);
+
+        if (btnKeyboard != null) {
+            android.view.ViewGroup.LayoutParams params = btnKeyboard.getLayoutParams();
+            if (params != null) {
+                params.width = sizePx;
+                params.height = sizePx;
+                btnKeyboard.setLayoutParams(params);
+            }
+        }
+        if (btnMenu != null) {
+            android.view.ViewGroup.LayoutParams params = btnMenu.getLayoutParams();
+            if (params != null) {
+                params.width = sizePx;
+                params.height = sizePx;
+                btnMenu.setLayoutParams(params);
+            }
+        }
+    }
+
+    private void updateBubbleColor() {
+        int color = prefs.getInt("bubble_color", android.graphics.Color.WHITE);
+        android.content.res.ColorStateList csl = android.content.res.ColorStateList.valueOf(color);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            if (btnKeyboard != null) {
+                btnKeyboard.setBackgroundTintList(csl);
+            }
+            if (btnMenu != null) {
+                btnMenu.setBackgroundTintList(csl);
+            }
+        }
+    }
+
+    private void updateBubbleAppearance() {
+        updateBubbleOpacity();
+        updateBubbleSize();
+        updateBubbleColor();
+    }
+
+    private void updateBubbleOpacity() {
+        int opacity = prefs.getInt("overlay_opacity", 75);
+        float alpha = Math.max(0.2f, opacity / 100f);
+        int alphaInt = (int)(alpha * 255);
+        
+        if (btnKeyboard != null) {
+            btnKeyboard.setAlpha(1.0f);
+            if (btnKeyboard instanceof android.widget.ImageView) {
+                ((android.widget.ImageView)btnKeyboard).setImageAlpha(alphaInt);
+            }
+            if (btnKeyboard.getBackground() != null) {
+                if (btnKeyboard.getBackground() != null) btnKeyboard.getBackground().setAlpha(alphaInt);
+            }
+        }
+        if (btnMenu != null) {
+            btnMenu.setAlpha(1.0f);
+            if (btnMenu instanceof android.widget.ImageView) {
+                ((android.widget.ImageView)btnMenu).setImageAlpha(alphaInt);
+            }
+            if (btnMenu.getBackground() != null) {
+                if (btnMenu.getBackground() != null) btnMenu.getBackground().setAlpha(alphaInt);
+            }
+        }
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -247,6 +462,34 @@ public class Game extends Activity implements SurfaceHolder.Callback,
         // allows proper touch splitting, which the OSC relies upon.
         View backgroundTouchView = findViewById(R.id.backgroundTouchView);
         backgroundTouchView.setOnTouchListener(this);
+
+        prefs = android.preference.PreferenceManager.getDefaultSharedPreferences(this);
+        btnKeyboard = findViewById(R.id.btn_keyboard);
+        if (btnKeyboard != null) {
+            btnKeyboard.setOnClickListener(new android.view.View.OnClickListener() {
+                @Override
+                public void onClick(android.view.View v) {
+                    toggleKeyboard();
+                }
+            });
+            setupDraggableBubble(btnKeyboard, "bubble_kb");
+        }
+
+        
+
+        btnMenu = findViewById(R.id.btn_menu);
+        if (btnMenu != null) {
+            btnMenu.setOnClickListener(new android.view.View.OnClickListener() {
+                @Override
+                public void onClick(android.view.View v) {
+                    showOverlayMenu();
+                }
+            });
+            setupDraggableBubble(btnMenu, "bubble_menu");
+        }
+        
+        applyBubbleVisibility();
+        updateBubbleAppearance();
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             // Request unbuffered input event dispatching for all input classes we handle here.
@@ -493,16 +736,7 @@ public class Game extends Activity implements SurfaceHolder.Callback,
         inputManager.registerInputDeviceListener(keyboardTranslator, null);
 
         // Initialize touch contexts
-        for (int i = 0; i < touchContextMap.length; i++) {
-            if (!prefConfig.touchscreenTrackpad) {
-                touchContextMap[i] = new AbsoluteTouchContext(conn, i, streamView);
-            }
-            else {
-                touchContextMap[i] = new RelativeTouchContext(conn, i,
-                        REFERENCE_HORIZ_RES, REFERENCE_VERT_RES,
-                        streamView, prefConfig);
-            }
-        }
+        updateTouchContexts();
 
         if (prefConfig.onscreenController) {
             // create virtual onscreen controller
@@ -533,6 +767,19 @@ public class Game extends Activity implements SurfaceHolder.Callback,
 
         // The connection will be started when the surface gets created
         streamView.getHolder().addCallback(this);
+    }
+
+    private void updateTouchContexts() {
+        for (int i = 0; i < touchContextMap.length; i++) {
+            if (!prefConfig.touchscreenTrackpad) {
+                touchContextMap[i] = new com.limelight.binding.input.touch.AbsoluteTouchContext(conn, i, streamView);
+            }
+            else {
+                touchContextMap[i] = new com.limelight.binding.input.touch.RelativeTouchContext(conn, i,
+                        REFERENCE_HORIZ_RES, REFERENCE_VERT_RES,
+                        streamView, prefConfig);
+            }
+        }
     }
 
     private void setPreferredOrientationForCurrentDisplay() {
@@ -577,6 +824,7 @@ public class Game extends Activity implements SurfaceHolder.Callback,
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
+        applyBubbleVisibility();
 
         // Set requested orientation for possible new screen size
         setPreferredOrientationForCurrentDisplay();
@@ -1502,6 +1750,296 @@ public class Game extends Activity implements SurfaceHolder.Callback,
         LimeLog.info("Toggling keyboard overlay");
         InputMethodManager inputManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         inputManager.toggleSoftInput(0, 0);
+    }
+
+    private void showOverlayMenu() {
+        LimeLog.info("Showing custom overlay menu");
+        android.view.View popupView = getLayoutInflater().inflate(R.layout.menu_overlay, null);
+        final android.widget.PopupWindow popupWindow = new android.widget.PopupWindow(
+                popupView,
+                android.widget.LinearLayout.LayoutParams.WRAP_CONTENT,
+                android.widget.LinearLayout.LayoutParams.WRAP_CONTENT,
+                true);
+                
+        // Toggle Mouse
+        android.view.View btnMouse = popupView.findViewById(R.id.btn_menu_mouse);
+        final android.widget.TextView tvMouseModeDesc = popupView.findViewById(R.id.tv_mouse_mode_desc);
+        tvMouseModeDesc.setText(prefConfig.touchscreenTrackpad ? "Touchpad relative" : "Direct Tap");
+        btnMouse.setOnClickListener(new android.view.View.OnClickListener() {
+            @Override
+            public void onClick(android.view.View v) {
+                prefConfig.touchscreenTrackpad = !prefConfig.touchscreenTrackpad;
+                updateTouchContexts();
+                tvMouseModeDesc.setText(prefConfig.touchscreenTrackpad ? "Touchpad relative" : "Direct Tap");
+            }
+        });
+        
+        // Switch Display 1, 2, 3
+        popupView.findViewById(R.id.btn_menu_display_1).setOnClickListener(new android.view.View.OnClickListener() {
+            @Override
+            public void onClick(android.view.View v) {
+                sendSwitchDisplay(android.view.KeyEvent.KEYCODE_F1);
+                popupWindow.dismiss();
+            }
+        });
+        popupView.findViewById(R.id.btn_menu_display_2).setOnClickListener(new android.view.View.OnClickListener() {
+            @Override
+            public void onClick(android.view.View v) {
+                sendSwitchDisplay(android.view.KeyEvent.KEYCODE_F2);
+                popupWindow.dismiss();
+            }
+        });
+        popupView.findViewById(R.id.btn_menu_display_3).setOnClickListener(new android.view.View.OnClickListener() {
+            @Override
+            public void onClick(android.view.View v) {
+                sendSwitchDisplay(android.view.KeyEvent.KEYCODE_F3);
+                popupWindow.dismiss();
+            }
+        });
+        
+        // Ctrl+Alt+Del
+        android.view.View btnCad = popupView.findViewById(R.id.btn_menu_cad);
+        btnCad.setOnClickListener(new android.view.View.OnClickListener() {
+            @Override
+            public void onClick(android.view.View v) {
+                sendCtrlAltDel();
+                popupWindow.dismiss();
+            }
+        });
+        
+        // Disconnect
+        android.view.View btnDisconnect = popupView.findViewById(R.id.btn_menu_disconnect);
+        btnDisconnect.setOnClickListener(new android.view.View.OnClickListener() {
+            @Override
+            public void onClick(android.view.View v) {
+                popupWindow.dismiss();
+                disconnectSession();
+            }
+        });
+        
+        // Overlay Controls
+        final android.widget.SeekBar seekOpacity = popupView.findViewById(R.id.seek_opacity);
+        final android.widget.TextView tvOpacityVal = popupView.findViewById(R.id.tv_opacity_val);
+        int currentOpacity = prefs.getInt("overlay_opacity", 75);
+        seekOpacity.setProgress(currentOpacity);
+        tvOpacityVal.setText(currentOpacity + "%");
+        
+        seekOpacity.setOnSeekBarChangeListener(new android.widget.SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(android.widget.SeekBar seekBar, int progress, boolean fromUser) {
+                int val = Math.max(20, progress); // Enforce minimum UX opacity of 20%
+                tvOpacityVal.setText(val + "%");
+                prefs.edit().putInt("overlay_opacity", val).apply();
+                updateBubbleAppearance();
+            }
+            @Override
+            public void onStartTrackingTouch(android.widget.SeekBar seekBar) {}
+            @Override
+            public void onStopTrackingTouch(android.widget.SeekBar seekBar) {
+                int val = Math.max(20, seekBar.getProgress());
+                seekBar.setProgress(val);
+            }
+        });
+        
+        final android.widget.Switch switchKb = popupView.findViewById(R.id.switch_keyboard_btn);
+        switchKb.setChecked(prefs.getBoolean("show_keyboard_btn", true));
+
+        // Size slider
+        final android.widget.SeekBar seekSize = popupView.findViewById(R.id.seek_size);
+        final android.widget.TextView tvSize = popupView.findViewById(R.id.tv_size_val);
+        int currentSize = prefs.getInt("bubble_size", 50);
+        seekSize.setProgress(currentSize);
+        tvSize.setText((int)(30 + currentSize * 0.52f) + "dp");
+
+        seekSize.setOnSeekBarChangeListener(new android.widget.SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(android.widget.SeekBar seekBar, int progress, boolean fromUser) {
+                tvSize.setText((int)(30 + progress * 0.52f) + "dp");
+                prefs.edit().putInt("bubble_size", progress).apply();
+                updateBubbleSize();
+            }
+            @Override public void onStartTrackingTouch(android.widget.SeekBar seekBar) {}
+            @Override public void onStopTrackingTouch(android.widget.SeekBar seekBar) {}
+        });
+
+        // Colors
+        android.view.View.OnClickListener colorListener = new android.view.View.OnClickListener() {
+            @Override
+            public void onClick(android.view.View v) {
+                int color = android.graphics.Color.WHITE;
+                if (v.getId() == R.id.color_red) color = android.graphics.Color.parseColor("#FF5252");
+                else if (v.getId() == R.id.color_green) color = android.graphics.Color.parseColor("#4CAF50");
+                else if (v.getId() == R.id.color_blue) color = android.graphics.Color.parseColor("#2196F3");
+                
+                prefs.edit().putInt("bubble_color", color).apply();
+                updateBubbleColor();
+            }
+        };
+        android.view.View cw = popupView.findViewById(R.id.color_white);
+        android.view.View cr = popupView.findViewById(R.id.color_red);
+        android.view.View cg = popupView.findViewById(R.id.color_green);
+        android.view.View cb = popupView.findViewById(R.id.color_blue);
+        if (cw != null) cw.setOnClickListener(colorListener);
+        if (cr != null) cr.setOnClickListener(colorListener);
+        if (cg != null) cg.setOnClickListener(colorListener);
+        if (cb != null) cb.setOnClickListener(colorListener);
+
+        switchKb.setOnCheckedChangeListener(new android.widget.CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(android.widget.CompoundButton buttonView, boolean isChecked) {
+                prefs.edit().putBoolean("show_keyboard_btn", isChecked).apply();
+                applyBubbleVisibility();
+            }
+        });
+        
+        android.view.View btnReset = popupView.findViewById(R.id.btn_reset_overlay);
+        btnReset.setOnClickListener(new android.view.View.OnClickListener() {
+            @Override
+            public void onClick(android.view.View v) {
+                prefs.edit()
+                    .putFloat("bubble_kb_nx", 0.05f)
+                    .putFloat("bubble_kb_ny", 0.2f)
+                    .putFloat("bubble_menu_nx", 0.05f)
+                    .putFloat("bubble_menu_ny", 0.35f)
+                    .putInt("overlay_opacity", 75)
+                    .putBoolean("show_keyboard_btn", true)
+                    .apply();
+                    
+                seekOpacity.setProgress(75);
+                switchKb.setChecked(true);
+                updateBubbleAppearance();
+                applyBubbleVisibility();
+            }
+        });
+        
+        popupWindow.setElevation(20);
+        android.view.View anchor = findViewById(R.id.btn_menu);
+        
+        if (anchor != null) {
+            // Adaptive positioning
+            popupView.measure(android.view.View.MeasureSpec.makeMeasureSpec(0, android.view.View.MeasureSpec.UNSPECIFIED),
+                              android.view.View.MeasureSpec.makeMeasureSpec(0, android.view.View.MeasureSpec.UNSPECIFIED));
+            int pWidth = popupView.getMeasuredWidth();
+            int pHeight = popupView.getMeasuredHeight();
+            
+            float density = getResources().getDisplayMetrics().density;
+            int marginPx = (int) (12 * density);
+            
+            android.graphics.Rect visibleFrame = new android.graphics.Rect();
+            streamView.getWindowVisibleDisplayFrame(visibleFrame);
+            
+            int[] anchorLoc = new int[2];
+            anchor.getLocationInWindow(anchorLoc);
+            
+            int[] streamLoc = new int[2];
+            streamView.getLocationInWindow(streamLoc);
+            
+            // Convert anchor location to match visibleFrame bounds (which are in window coordinates)
+            int anchorX = anchorLoc[0];
+            int anchorY = anchorLoc[1];
+            
+            int x;
+            if (anchorX + anchor.getWidth() + marginPx + pWidth <= visibleFrame.right) {
+                x = anchorX + anchor.getWidth() + marginPx;
+            } else if (anchorX - marginPx - pWidth >= visibleFrame.left) {
+                x = anchorX - marginPx - pWidth;
+            } else {
+                x = visibleFrame.right - pWidth - marginPx;
+            }
+            
+            // Enforce max height
+            int maxAvailableHeight = visibleFrame.bottom - visibleFrame.top - marginPx * 2;
+            if (pHeight > maxAvailableHeight) {
+                popupWindow.setHeight(maxAvailableHeight);
+                pHeight = maxAvailableHeight;
+            }
+            
+            int y = anchorY;
+            if (y + pHeight > visibleFrame.bottom) {
+                y = visibleFrame.bottom - pHeight - marginPx;
+            }
+            if (y < visibleFrame.top) {
+                y = visibleFrame.top + marginPx;
+            }
+            
+            popupWindow.showAtLocation(streamView, android.view.Gravity.NO_GRAVITY, x, y);
+        } else {
+            popupWindow.showAtLocation(streamView, android.view.Gravity.CENTER, 0, 0);
+        }
+    }
+
+    private Runnable switchDisplayRunnable;
+    private android.os.Handler switchDisplayHandler = new android.os.Handler(android.os.Looper.getMainLooper());
+
+    private void sendSwitchDisplay(int keycode) {
+        if (switchDisplayRunnable != null) {
+            switchDisplayHandler.removeCallbacks(switchDisplayRunnable);
+        }
+        
+        LimeLog.info("Sending display switch shortcut for keycode: " + keycode);
+        final short fx = keyboardTranslator.translate(keycode, 0);
+        final short ctrl = keyboardTranslator.translate(android.view.KeyEvent.KEYCODE_CTRL_LEFT, 0);
+        final short alt = keyboardTranslator.translate(android.view.KeyEvent.KEYCODE_ALT_LEFT, 0);
+        final short shift = keyboardTranslator.translate(android.view.KeyEvent.KEYCODE_SHIFT_LEFT, 0);
+        
+        final byte mCtrl = com.limelight.nvstream.input.KeyboardPacket.MODIFIER_CTRL;
+        final byte mAlt = com.limelight.nvstream.input.KeyboardPacket.MODIFIER_ALT;
+        final byte mShift = com.limelight.nvstream.input.KeyboardPacket.MODIFIER_SHIFT;
+        final byte allMods = (byte) (mCtrl | mAlt | mShift);
+
+        conn.sendKeyboardInput(ctrl, com.limelight.nvstream.input.KeyboardPacket.KEY_DOWN, (byte)0, (byte)0);
+        conn.sendKeyboardInput(alt, com.limelight.nvstream.input.KeyboardPacket.KEY_DOWN, mCtrl, (byte)0);
+        conn.sendKeyboardInput(shift, com.limelight.nvstream.input.KeyboardPacket.KEY_DOWN, (byte)(mCtrl | mAlt), (byte)0);
+        conn.sendKeyboardInput(fx, com.limelight.nvstream.input.KeyboardPacket.KEY_DOWN, allMods, (byte)0);
+        
+        switchDisplayRunnable = new Runnable() {
+            @Override
+            public void run() {
+                conn.sendKeyboardInput(fx, com.limelight.nvstream.input.KeyboardPacket.KEY_UP, allMods, (byte)0);
+                conn.sendKeyboardInput(shift, com.limelight.nvstream.input.KeyboardPacket.KEY_UP, (byte)(mCtrl | mAlt), (byte)0);
+                conn.sendKeyboardInput(alt, com.limelight.nvstream.input.KeyboardPacket.KEY_UP, mCtrl, (byte)0);
+                conn.sendKeyboardInput(ctrl, com.limelight.nvstream.input.KeyboardPacket.KEY_UP, (byte)0, (byte)0);
+                switchDisplayRunnable = null;
+            }
+        };
+        switchDisplayHandler.postDelayed(switchDisplayRunnable, 50);
+        
+        int displayNum = keycode - android.view.KeyEvent.KEYCODE_F1 + 1;
+        android.widget.Toast.makeText(this, "Switching to Monitor " + displayNum, android.widget.Toast.LENGTH_SHORT).show();
+    }
+
+    private void sendCtrlAltDel() {
+        short delCode = keyboardTranslator.translate(android.view.KeyEvent.KEYCODE_FORWARD_DEL, 0);
+        byte modifiers = (byte) (com.limelight.nvstream.input.KeyboardPacket.MODIFIER_CTRL | com.limelight.nvstream.input.KeyboardPacket.MODIFIER_ALT);
+        conn.sendKeyboardInput(delCode, com.limelight.nvstream.input.KeyboardPacket.KEY_DOWN, modifiers, (byte) 0);
+        conn.sendKeyboardInput(delCode, com.limelight.nvstream.input.KeyboardPacket.KEY_UP, modifiers, (byte) 0);
+        android.widget.Toast.makeText(this, "Ctrl+Alt+Del Sent", android.widget.Toast.LENGTH_SHORT).show();
+    }
+
+    private void disconnectSession() {
+        new android.app.AlertDialog.Builder(this)
+                .setTitle("Disconnect")
+                .setMessage("Are you sure you want to disconnect from the current session?")
+                .setPositiveButton("Disconnect", new android.content.DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(android.content.DialogInterface dialog, int which) {
+                        if (switchDisplayRunnable != null) {
+                            switchDisplayHandler.removeCallbacks(switchDisplayRunnable);
+                            switchDisplayRunnable.run();
+                        }
+                        
+                        for (com.limelight.binding.input.touch.TouchContext context : touchContextMap) {
+                            if (context != null) context.cancelTouch();
+                        }
+                        conn.sendMouseButtonUp(com.limelight.nvstream.input.MouseButtonPacket.BUTTON_LEFT);
+                        conn.sendMouseButtonUp(com.limelight.nvstream.input.MouseButtonPacket.BUTTON_RIGHT);
+                        conn.sendMouseButtonUp(com.limelight.nvstream.input.MouseButtonPacket.BUTTON_MIDDLE);
+                        
+                        finish();
+                    }
+                })
+                .setNegativeButton("Cancel", null)
+                .show();
     }
 
     private byte getLiTouchTypeFromEvent(MotionEvent event) {
