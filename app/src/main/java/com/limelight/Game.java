@@ -1902,10 +1902,14 @@ public class Game extends Activity implements SurfaceHolder.Callback,
                     .putFloat("bubble_menu_nx", 0.05f)
                     .putFloat("bubble_menu_ny", 0.35f)
                     .putInt("overlay_opacity", 75)
+                    .putInt("bubble_size", 50)
+                    .putInt("bubble_color", android.graphics.Color.WHITE)
                     .putBoolean("show_keyboard_btn", true)
                     .apply();
                     
                 seekOpacity.setProgress(75);
+                seekSize.setProgress(50);
+                tvSize.setText("56dp");
                 switchKb.setChecked(true);
                 updateBubbleAppearance();
                 applyBubbleVisibility();
